@@ -1,4 +1,4 @@
-from core.command import ICommand, BaseInvoker, CommandErrorCode, CommandError, Result
+from core.command import ICommand, BaseInvoker, CommandErrorCode, InvokerErrorCode, Result
 import screen_brightness_control as sbc
 import os
 import platform

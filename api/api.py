@@ -12,16 +12,16 @@ async def root():
     return {"message": "Hello World"}
 
 @app.put("/api/v1/system/sleep", tags=["System"])
-async def sleep():
-    if not sys.invoke("sleep", type="sleep").succeded():
+async def sleep(delay: int = Query(0, description="The delay before the system sleeps in seconds.")):
+    if not sys.invoke("sleep", type="sleep", delay=delay).succeded():
         raise HTTPException(status_code=500, detail="Failed to sleep")
 
     return JSONResponse(content={"status": "success"},
                         status_code=200)
 
 @app.put("/api/v1/system/shutdown", tags=["System"])
-async def shutdown():
-    if not sys.invoke("sleep", type="sleep").succeded():
+async def shutdown(delay: int = Query(0, description="The delay before the system shuts down in seconds.")):
+    if not sys.invoke("shutdown", type="shutdown", delay=delay).succeded():
         raise HTTPException(status_code=500, detail="Failed to shutdown")
 
     return JSONResponse(content={"status": "success"},
@@ -35,7 +35,7 @@ async def volume(volume: float = Query(..., ge=0, le=100)):
     return JSONResponse(content={"status": "success"},
                         status_code=200)
 
-@app.put("/api/v1/multimedia/playpause", tags=["Multimedia"])
+@app.put("/api/v1/multimedia/trackcontrol", tags=["Multimedia"])
 async def track_control(action: str = Query(..., description="The action to perform. Possible values are 'playpause', 'next', and 'prev'")):
     if not multimedia.invoke("track", action=action).succeded():
         raise HTTPException(status_code=500, detail="Failed to perform action")

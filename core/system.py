@@ -59,7 +59,7 @@ class Sleep(ICommand):
     # and executes it via the os module
     def _sleep(self, delay=None):
         os_type = self._get_os()
-        if delay is None:
+        if delay is None or delay == 0:
             command = self.SYSTEM_CALLS['sleep']['instant'][os_type]
         else:
             command = self.SYSTEM_CALLS['sleep']['deferred'][os_type] \

@@ -1,11 +1,12 @@
 from core.command import Command, Invoker
+import screen_brightness_control as sbc
 import os
 
 class System(Invoker):
     def __init__(self) -> None:
         self.commands = {
             "sleep": Sleep(),
-            "print": Print()
+            "shutdown": Shutdown(),
         }
 
     def invoke(self, command_id: str, *args, **kwargs):
@@ -13,11 +14,8 @@ class System(Invoker):
 
 class Sleep(Command):
     def execute(self, *args, **kwargs):
-        self._sleep()
-
-    def _sleep(self):
         return os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
 
-class Print(Command):
+class Shutdown(Command):
     def execute(self, *args, **kwargs):
-        print("Hello World")
+        return os.system("shutdown /s /t 1")

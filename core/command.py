@@ -67,6 +67,7 @@ class BaseInvoker():
 
 class CommandErrorCode(Enum):
     INVALID_ARGUMENT = 1
+    MISSING_ARGUMENT = 2
 
 class InvokerErrorCode(Enum):
     INVALID_COMMAND = 1

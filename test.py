@@ -1,5 +1,7 @@
 import unittest
 from core.command import BaseInvoker, ICommand, Result, CoreException, CommandErrorCode, InvokerErrorCode
+from core.system import Sleep
+from core.multimedia import Volume
 
 class TestCommand(ICommand):
     # Executing the test command with a filter argument returns a the filter as a Result value
@@ -18,6 +20,58 @@ class TestCommand(ICommand):
 
         # Otherwise, return the filter as a value
         return Result.from_value(filter)
+
+class TestSleepCommand(unittest.TestCase):
+    def setUp(self):
+        self.command = Sleep()
+
+        # Mock system calls
+        self.command._set_system_calls({
+            "sleep": {
+                "instant": {
+                    "linux": "echo 'systemctl suspend'",
+                    "windows": "echo 'rundll32.exe powrprof.dll,SetSuspendState 0,1,0'"
+                },
+                "deferred": {
+                    "linux": "echo 'systemctl suspend in {} minutes'",
+                    "windows": "echo 'sleep in {} seconds'"
+                }
+            },
+            "shutdown": {
+                "instant": {
+                    "linux": "echo 'shutdown -h now'",
+                    "windows": "echo 'shutdown /s /t 1'"
+                },
+                "deferred": {
+                    "linux": "echo 'shutdown -h in {} minutes'",
+                    "windows": "echo 'shutdown /s /t {} seconds'"
+                }
+            }
+        })
+
+    def test_execute_success(self):
+        result = self.command.execute(type='sleep')
+        self.assertTrue(result.succeded())
+        self.assertEqual(result.value, 0)
+
+        result = self.command.execute(type='shutdown')
+        self.assertTrue(result.succeded())
+        self.assertEqual(result.value, 0)
+
+        result = self.command.execute(type='sleep', delay=1)
+        self.assertTrue(result.succeded())
+        self.assertEqual(result.value, 0)
+
+        result = self.command.execute(type='shutdown', delay=1)
+        self.assertTrue(result.succeded())
+        self.assertEqual(result.value, 0)
+
+    def test_execute_failure(self):
+        self.assertFalse(self.command.execute(type='invalid').succeded())
+        result = self.command.execute(type='invalid')
+        self.assertIsNone(result.value)
+        self.assertEqual(result.error.code, CommandErrorCode.INVALID_ARGUMENT)
+        self.assertEqual(result.error.message, 'Invalid argument: invalid')
 
 class TestBaseInvoker(unittest.TestCase):
     def setUp(self):

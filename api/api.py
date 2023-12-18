@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import JSONResponse
 from core import system
 
 app = FastAPI()
@@ -10,7 +11,15 @@ async def root():
 
 @app.get("/api/v1/sleep")
 async def sleep():
-    sys.execute("sleep")
+    if sys.invoke("sleep") != 0:
+        raise HTTPException(status_code=500, detail="Failed to sleep")
+
+    return JSONResponse(content={"status": "success"}, status_code=200)
+
+@app.get("/api/v1/print")
+async def print():
+    sys.invoke("print")
+    return JSONResponse(content={"status": "success"}, status_code=200)
 
 def run():
     import uvicorn

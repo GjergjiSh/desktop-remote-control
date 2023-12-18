@@ -1,14 +1,23 @@
-from core.command import Command
+from core.command import Command, Invoker
 import os
 
-class System(Command):
+class System(Invoker):
+    def __init__(self) -> None:
+        self.commands = {
+            "sleep": Sleep(),
+            "print": Print()
+        }
+
+    def invoke(self, command_id: str, *args, **kwargs):
+        return self.commands[command_id].execute(*args, **kwargs)
+
+class Sleep(Command):
     def execute(self, *args, **kwargs):
         self._sleep()
 
     def _sleep(self):
-        os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+        return os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
 
-
-    # COMMANDS = {
-    #     "sleep": sleep
-    # }
+class Print(Command):
+    def execute(self, *args, **kwargs):
+        print("Hello World")

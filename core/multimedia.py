@@ -30,13 +30,13 @@ class Volume(ICommand):
                 'Missing argument: Missing volume'
             ))
 
-        self._set_volume(volume)
-        return Result.from_value(self.volume)
+        return Result.from_value(self._set_volume(volume))
 
     def _set_volume(self, volume: float):
         # Ensure the volume is between 0.0 and 1.0
         volume = max(0.0, min(100.0, volume)) / 100.0
         self._volume.SetMasterVolumeLevelScalar(volume, None)
+        return self.volume
 
 class Track(ICommand):
     def __init__(self) -> None:

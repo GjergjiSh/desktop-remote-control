@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from concurrent.futures import Future
-from typing import Generic, TypeVar, Union, Optional
+from typing import Generic, Optional, TypeVar
 
 T = TypeVar('T')
 

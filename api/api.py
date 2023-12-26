@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException, Response, Query
 from fastapi.responses import JSONResponse
-from core.system import System
+from core.system import PowerButton
 from core.multimedia import Multimedia
 
 app = FastAPI()
-sys = System()
+sys = PowerButton()
 multimedia = Multimedia()
 
 @app.get("/")

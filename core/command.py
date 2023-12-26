@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Generic, Optional, TypeVar
 
 T = TypeVar('T')
+ErrorCode = TypeVar('ErrorCode', bound=Enum)
 
 class Result(Generic[T]):
     def __init__(self, value: Optional[T] = None, error: Optional[Exception] = None):
@@ -25,11 +26,17 @@ class Result(Generic[T]):
 
     @staticmethod
     def from_value(value: T) -> 'Result':
-        return Result(value=value)
+        return Result(value=value, error=None)
 
     @staticmethod
     def from_error(error: Exception) -> 'Result':
-        return Result(error=error)
+        return Result(error=error, value=None)
+
+    def __str__(self) -> str:
+        return f'({self._value}, {self._error})'
+
+    def __repr__(self) -> str:
+        return f'({self._value}, {self._error})'
 
 class ICommand(ABC):
     @abstractmethod
@@ -70,8 +77,6 @@ class CommandErrorCode(Enum):
 
 class InvokerErrorCode(Enum):
     INVALID_COMMAND = 1
-
-ErrorCode = TypeVar('ErrorCode', bound=Enum)
 
 class CoreException(Exception):
     def __init__(self, code: ErrorCode, message: str):

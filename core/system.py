@@ -3,7 +3,7 @@ import screen_brightness_control as sbc
 import os
 import platform
 
-class System(BaseInvoker):
+class PowerButton(BaseInvoker):
     def __init__(self) -> None:
         self.commands = {
             "sleep": Sleep(),

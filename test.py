@@ -1,25 +1,17 @@
 import unittest
 from core.command import BaseInvoker, ICommand, Result, CoreException, CommandErrorCode, InvokerErrorCode
 from core.system import Sleep
-from core.multimedia import Volume
 
 class TestCommand(ICommand):
-    # Executing the test command with a filter argument returns a the filter as a Result value
-    # Executing the test command with no arguments returns an an error as a Result error
     def execute(self, *args, **kwargs):
-        filter = kwargs.get('filter', -1)
-        return self._execute(filter)
-
-    def _execute(self, filter: int):
-        # If no filter was provided, return an error
-        if filter == -1:
+        should_succeed = kwargs.get('should_succeed')
+        if should_succeed is False:
             return Result.from_error(CoreException(
                 CommandErrorCode.INVALID_ARGUMENT,
                 'Invalid argument'
             ))
 
-        # Otherwise, return the filter as a value
-        return Result.from_value(filter)
+        return Result.from_value(True)
 
 class TestSleepCommand(unittest.TestCase):
     def setUp(self):
@@ -93,14 +85,14 @@ class TestBaseInvoker(unittest.TestCase):
 
     def test_invoke_success(self):
         # Invoke with arguments
-        result = self.invoker.invoke('test', filter=1)
-        # Check that the result is a success and that the value is 1
+        result = self.invoker.invoke('test', should_succeed=True)
+        # Check that the result is a success and that the value is 0
         self.assertTrue(result.succeded())
         self.assertEqual(result.value, 1)
 
     def test_invoke_failure(self):
         # Invoke with no arguments
-        result = self.invoker.invoke('test')
+        result = self.invoker.invoke('test', should_succeed=False)
         self.assertTrue(result.failed())
         # Check that the result is a failure and that the error code and message are correct
         self.assertEqual(result.error.code, CommandErrorCode.INVALID_ARGUMENT)

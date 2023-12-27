@@ -43,6 +43,14 @@ async def track_control(action: str = Query(..., description="The action to perf
     return JSONResponse(content={"status": "success"},
                         status_code=200)
 
+@app.put("/api/v1/multimedia/sounddevice", tags=["Multimedia"])
+async def sound_device(device: str = Query(..., description="The name of the sound device to use. Possible values are 'speakers' and 'headphones'")):
+    if not multimedia.invoke("sounddevice", device=device).succeded():
+        raise HTTPException(status_code=500, detail="Failed to set sound device")
+
+    return JSONResponse(content={"status": "success"},
+                        status_code=200)
+
 def run():
     import uvicorn
     uvicorn.run(app, host="localhost", port=3000)

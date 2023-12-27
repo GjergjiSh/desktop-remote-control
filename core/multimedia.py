@@ -4,12 +4,14 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from comtypes import CLSCTX_ALL
 from ctypes import cast, POINTER
 from pynput.keyboard import Controller, Key
+import os
 
 class Multimedia(BaseInvoker):
     def __init__(self) -> None:
         self.commands = {
             "volume": Volume(),
-            "track": Track()
+            "track": Track(),
+            "sounddevice": SoundDevice()
         }
 
 class Volume(ICommand):
@@ -75,3 +77,34 @@ class Track(ICommand):
     def _prev(self):
         self.keyboard.press(Key.media_previous)
         self.keyboard.release(Key.media_previous)
+
+
+class SoundDevice(ICommand):
+    SYSTEM_CALLS = "{} setdefaultsounddevice {} 1"
+
+    def __init__(self):
+        self.devices = {
+            "speakers": '"Main Speakers"',
+            "headphones": '"Headphones"',
+        }
+
+        self.nircmdbin = r"C:\Users\Gjergji\Repos\desktop-remote-control\thirdparty\nircmd\nircmd.exe"
+
+    def execute(self, *args, **kwargs) -> Result:
+        device = kwargs.get('device')
+        if device is None:
+            return Result.from_error(CoreException(
+                CommandErrorCode.MISSING_ARGUMENT,
+                'Missing argument: Missing device'
+            ))
+
+        if device not in self.devices:
+            return Result.from_error(CoreException(
+                CommandErrorCode.INVALID_ARGUMENT,
+                f'Invalid argument: {device}'
+            ))
+
+        return Result.from_value(self._set_device(device))
+
+    def _set_device(self, device: str):
+        return os.system(self.SYSTEM_CALLS.format(self.nircmdbin, self.devices[device]))
